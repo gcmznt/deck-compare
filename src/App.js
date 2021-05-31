@@ -44,18 +44,104 @@ function Header({ deck, remove }) {
 
 function Stats({ deck }) {
   return (
-    <dl className="stats-list">
-      <dt>Cards:</dt>
-      <dd>{deck.stats.cards}</dd>
-      <dt>Packs:</dt>
-      <dd>{Object.entries(deck.stats.packs).length}</dd>
-      <dt>Shared:</dt>
-      <dd>{deck.stats.shared}</dd>
-      <dt>Danger:</dt>
-      <dd>{deck.stats.danger}</dd>
-      <dt>Warnings:</dt>
-      <dd>{deck.stats.warning}</dd>
-    </dl>
+    <div>
+      <dl className="stats-list">
+        <dt>Cards:</dt>
+        <dd>{deck.stats.cards}</dd>
+        <dt>Packs:</dt>
+        <dd>{Object.entries(deck.stats.packs).length}</dd>
+        <dt>Shared:</dt>
+        <dd>{deck.stats.shared}</dd>
+        <dt>Average cost:</dt>
+        <dd>
+          {(deck.stats.averageCost.cost / deck.stats.averageCost.cards).toFixed(
+            2
+          )}
+        </dd>
+        <dt>Danger:</dt>
+        <dd>{deck.stats.danger}</dd>
+        <dt>Warnings:</dt>
+        <dd>{deck.stats.warning}</dd>
+      </dl>
+      <div className="chart">
+        Aspects
+        <div className="lines">
+          {Object.entries(deck.stats.aspects)
+            .sort(([a], [b]) => {
+              if (a === "hero") return -1;
+              if (b === "hero") return 1;
+              if (a === "basic") return -1;
+              if (b === "basic") return 1;
+              return a.localeCompare(b);
+            })
+            .map(([id, val]) => (
+              <div
+                key={id}
+                className={`line ${id}`}
+                style={{ width: `${(val / deck.stats.cards) * 100}%` }}
+              />
+            ))}
+        </div>
+        <div className="legend">
+          {deck.stats.aspects.hero && <div className="hero">Hero</div>}
+          {deck.stats.aspects.basic && <div className="basic">Basic</div>}
+          {deck.stats.aspects.leadership && (
+            <div className="leadership">Leadership</div>
+          )}
+          {deck.stats.aspects.aggression && (
+            <div className="aggression">Aggression</div>
+          )}
+          {deck.stats.aspects.protection && (
+            <div className="protection">Protection</div>
+          )}
+          {deck.stats.aspects.justice && <div className="justice">Justice</div>}
+        </div>
+      </div>
+      <div className="chart">
+        Types
+        <div className="lines">
+          {Object.entries(deck.stats.types)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([id, val]) => (
+              <div
+                key={id}
+                className={`line ${id}`}
+                style={{ width: `${(val / deck.stats.cards) * 100}%` }}
+              />
+            ))}
+        </div>
+        <div className="legend">
+          <div className="ally">Ally</div>
+          <div className="event">Event</div>
+          <div className="resource">Resource</div>
+          <div className="support">Support</div>
+          <div className="upgrade">Upgrade</div>
+        </div>
+      </div>
+      <div className="chart">
+        Costs
+        <div className="lines">
+          {Object.entries(deck.stats.costs)
+            .sort(([a], [b]) => +a - b)
+            .map(([id, val]) => (
+              <div
+                key={id}
+                className={`line cost${+id >= 5 ? 5 : id}`}
+                style={{ width: `${(val / deck.stats.cards) * 100}%` }}
+              />
+            ))}
+        </div>
+        <div className="legend">
+          <div className="cost0">0</div>
+          <div className="cost1">1</div>
+          <div className="cost2">2</div>
+          <div className="cost3">3</div>
+          <div className="cost4">4</div>
+          <div className="cost5">5+</div>
+          <div className="costNo">No cost</div>
+        </div>
+      </div>
+    </div>
   );
 }
 

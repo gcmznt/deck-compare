@@ -52,9 +52,10 @@ const getCards = (decks) => {
 };
 
 function getStats(current, value, quantity) {
+  const key = typeof value !== "undefined" ? value : "No";
   return {
     ...(current || {}),
-    [value]: (current?.[value] || 0) + quantity,
+    [key]: (current?.[key] || 0) + quantity,
   };
 }
 
@@ -69,6 +70,18 @@ function calcStats(cards, deck) {
         (current.warning || 0) +
         (cards[id].decks > 1 && cards[id].info.is_unique),
       costs: getStats(current.costs, cards[id].info.cost, deck.info.slots[id]),
+      averageCost: Object.entries(
+        getStats(current.costs, cards[id].info.cost, deck.info.slots[id])
+      ).reduce(
+        (a, c) =>
+          Number.isNaN(parseInt(c[0]))
+            ? a
+            : {
+                cost: (a.cost || 0) + c[0] * c[1],
+                cards: (a.cards || 0) + c[1],
+              },
+        {}
+      ),
       types: getStats(
         current.types,
         cards[id].info.type_code,
