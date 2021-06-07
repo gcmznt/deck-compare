@@ -59,6 +59,16 @@ function getStats(current, value, quantity) {
   };
 }
 
+function getResources(current, info, quantity) {
+  return {
+    wild: (current?.wild || 0) + (info.resource_wild || 0) * quantity,
+    mental: (current?.mental || 0) + (info.resource_mental || 0) * quantity,
+    energy: (current?.energy || 0) + (info.resource_energy || 0) * quantity,
+    physical:
+      (current?.physical || 0) + (info.resource_physical || 0) * quantity,
+  };
+}
+
 function calcStats(cards, deck) {
   return Object.keys(deck.info.slots).reduce(
     (current, id) => ({
@@ -70,6 +80,11 @@ function calcStats(cards, deck) {
         (current.warning || 0) +
         (cards[id].decks > 1 && cards[id].info.is_unique),
       costs: getStats(current.costs, cards[id].info.cost, deck.info.slots[id]),
+      resources: getResources(
+        current.resources,
+        cards[id].info,
+        deck.info.slots[id]
+      ),
       averageCost: Object.entries(
         getStats(current.costs, cards[id].info.cost, deck.info.slots[id])
       ).reduce(
@@ -109,6 +124,12 @@ function getAspect(stats) {
     .sort((a, b) => b[1] - a[1])[0][0];
 }
 
+const regex = /marvelcdb\.com\/decklist\/view\/(?<id>[\d]+)/;
+
+function getIdFromUrl(url) {
+  return regex.exec(url).groups.id;
+}
+
 export class DeckCompare {
   cards = {};
   decks = [];
@@ -130,8 +151,8 @@ export class DeckCompare {
       .then(() => ({ ...this }));
   }
 
-  async addDeck(id) {
-    return getDeckInfo(id)
+  async addDeck(deck) {
+    return getDeckInfo(isNaN(deck) ? getIdFromUrl(deck) : deck)
       .then((info) => (this.decks = [...this.decks, { info }]))
       .then(() => this.updateData());
   }

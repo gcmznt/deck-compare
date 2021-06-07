@@ -3,15 +3,109 @@ body {
   font-variant: small-caps;
 }
 
-.decks,
-.headers,
-.stats {
+a {
+  color: inherit;
+}
+
+.add-deck {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: all ease 200ms;
+  transform-origin: bottom right;
+  bottom: 0;
+  right: 0;
+}
+
+.add-deck .toggle {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  font-size: 40px;
+  width: 50px;
+  height: 50px;
+  background: red;
+  border-radius: 50px;
+  text-align: center;
+  line-height: 44px;
+  transform: rotate(45deg);
+  margin: 20px;
+  transition: all ease 200ms;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
+
+.add-deck.closed .toggle {
+  transform: rotate(0deg);
+}
+
+.add-deck.closed {
+  width: 50px;
+  height: 50px;
+  margin: 20px;
+  border-radius: 50px;
+}
+
+.add-deck form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.add-deck.closed form,
+.add-deck.closed .test {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.add-deck h2 {
+  margin-top: 0;
+}
+
+.add-deck input {
+  margin-right: 10px;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #000;
+}
+
+.test {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
+  grid-template-columns: auto;
+  grid-gap: 2px;
+  margin-top: 20px;
+}
+
+.headers {
+  text-align: left;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: separate;
+  table-layout: fixed;
+  width: 100%;
+  max-width: calc(var(--decks) * 400px);
+  margin: auto;
+}
+
+td {
+  padding: 0;
+  vertical-align: top;
 }
 
 .stats {
-  margin-bottom: 20px;
+  padding-bottom: 30px;
 }
 
 header {
@@ -43,19 +137,20 @@ header {
   line-height: 0;
 }
 
-.unique::after {
-  content: " ★";
-  color: #f2ca00;
+.unique {
+  position: relative;
 }
 
-button::before,
+.unique::after {
+  content: "★ ";
+  /* color: #f2ca00; */
+}
+
+.test button::before,
 .deck-name::before,
 .card .aspect::before {
   content: "● ";
   color: var(--color);
-}
-.card .aspect.hero::before {
-  content: "■ ";
 }
 
 .warning {
@@ -69,41 +164,71 @@ button::before,
 }
 
 .chart {
-  padding: 20px;
+  margin: 20px;
+  position: relative;
+}
+
+.chart .line[data-val]::before {
+  content: attr(data-val);
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  opacity: 0;
+}
+
+.chart:hover .title {
+  opacity: 0;
+}
+
+.chart:not(:hover) .values {
+  opacity: 0;
+  top: 20px;
+}
+
+.title {
+  transition: all ease 100ms;
+}
+
+.values {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  transition: all ease 100ms;
+  top: 0;
 }
 
 .lines {
   height: 8px;
   margin-top: 5px;
-  overflow: hidden;
   border-radius: 4px;
   display: flex;
 }
 
-.cost0,
+.cost4,
 .aggression,
+.physical,
 .ally {
   --color: #e01414;
 }
-.cost1 {
-  --color: #f27500;
-}
-.cost2,
+.cost3,
 .justice,
+.energy,
 .event {
   --color: #f2ca00;
 }
-.cost3,
+.cost2,
 .protection,
+.wild,
 .resource {
   --color: #00cc4e;
 }
-.cost4,
+.cost1,
 .leadership,
+.mental,
 .support {
   --color: #3499eb;
 }
-.cost5,
+.cost0,
 .hero,
 .upgrade {
   --color: #cc00ff;
@@ -116,6 +241,20 @@ button::before,
 .line {
   height: 100%;
   background-color: var(--color);
+  position: relative;
+}
+
+.value {
+  color: var(--color);
+  padding: 0 5px 0 0;
+}
+
+.line:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.line:last-child {
+  border-radius: 0 4px 4px 0;
 }
 
 .legend {
