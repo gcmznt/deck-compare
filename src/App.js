@@ -394,7 +394,6 @@ function App({ startingDecks }) {
   useEffect(() => {
     if (data.decks) {
       const url = new URL(window.location);
-      console.log(data.decks.map((d) => d.info.id));
       if (data.decks.length) {
         url.searchParams.set(
           "decks",
@@ -411,7 +410,7 @@ function App({ startingDecks }) {
     if (dc && startingDecks) startingDecks.map(addDeck);
   }, [addDeck, dc, startingDecks]);
 
-  console.log(startingDecks, data);
+  console.log(data);
 
   return (
     <div className="App">

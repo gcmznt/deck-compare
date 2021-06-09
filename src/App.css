@@ -162,6 +162,7 @@ header {
   left: -5px;
   top: 10px;
   pointer-events: none;
+  mix-blend-mode: darken;
 }
 
 .test button::before,
