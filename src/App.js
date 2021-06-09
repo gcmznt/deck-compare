@@ -376,7 +376,10 @@ function App({ startingDecks }) {
 
   const addDeck = useCallback(
     (deck) => {
-      window.ga("send", "event", "Deck", "add", deck);
+      window.gtag("event", "add", {
+        event_category: "Deck",
+        event_label: deck,
+      });
       dc.addDeck(deck).then(setData);
     },
     [dc]
