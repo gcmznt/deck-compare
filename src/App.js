@@ -17,15 +17,28 @@ function Card({ card, quantity }) {
       className={`card ${status}`}
     >
       <span
-        className={`aspect ${card.info.faction_code}`}
+        className={`aspect ${card.info.faction_code} q${quantity}`}
         title={card.info.faction_name}
-      />
+      >
+        ●
+      </span>
       {quantity} ×{" "}
       {card.info.is_unique && <span className="unique" title="Unique"></span>}
       <a href={card.info.url} target="_blank" rel="noreferrer">
         {card.info.name}
       </a>
       {card.info.subname ? <small> | {card.info.subname}</small> : ""}
+      <div className="card-resources">
+        {["energy", "mental", "physical", "wild"].map(
+          (type) =>
+            !!card.info[`resource_${type}`] &&
+            new Array(card.info[`resource_${type}`])
+              .fill(1)
+              .map((_, i) => (
+                <span key={i} className={`card-resource ${type}`} />
+              ))
+        )}
+      </div>
     </div>
   ) : (
     <div className="card empty">&nbsp;</div>
@@ -48,7 +61,15 @@ function Header({ deck, remove }) {
       <h4>
         {deck.info.investigator_name} [{deck.info.id}]
       </h4>
-      <h2 className={`deck-name ${deck.aspect}`}>{deck.info.name}</h2>
+      <h2 className={`deck-name ${deck.aspect}`}>
+        <a
+          href={`https://marvelcdb.com/decklist/view/${deck.info.id}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {deck.info.name}
+        </a>
+      </h2>
       <button onClick={remove}>Remove</button>
     </header>
   );
@@ -76,7 +97,7 @@ function Stats({ deck }) {
             2
           )}
         </dd>
-        <dt>Res/card:</dt>
+        <dt>Resource/card:</dt>
         <dd>
           {(
             Object.values(deck.stats.resources).reduce((a, b) => a + b) /
@@ -256,8 +277,15 @@ function Stats({ deck }) {
 }
 
 function Cards({ card, decks }) {
-  return decks.map((deck) => (
-    <td key={deck.info.id}>
+  const status = (() => {
+    if (card.quantity > card.availability) return "danger";
+    if (card.decks > 1 && card.info.is_unique) return "warning";
+    if (card.decks > 1) return "shared";
+    return "ok";
+  })();
+
+  return decks.map((deck, i) => (
+    <td key={i} className={status}>
       <Card card={card} quantity={deck.info.slots[card.info.code] || 0} />
     </td>
   ));
@@ -341,7 +369,7 @@ function AddDeck({ add }) {
   );
 }
 
-function App() {
+function App({ startingDecks }) {
   const [dc, setDc] = useState(false);
   const [data, setData] = useState({ cards: {}, decks: [] });
   const [showConflicts, setShowConflicts] = useState(false);
@@ -355,20 +383,26 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (data.decks.length) {
+    if (data.decks) {
       const url = new URL(window.location);
       console.log(data.decks.map((d) => d.info.id));
-      url.searchParams.set("decks", data.decks.map((d) => d.info.id).join("|"));
+      if (data.decks.length) {
+        url.searchParams.set(
+          "decks",
+          data.decks.map((d) => d.info.id).join("|")
+        );
+      } else {
+        url.searchParams.delete("decks");
+      }
       window.history.pushState({}, "", url);
     }
   }, [data]);
 
   useEffect(() => {
-    const load = new URLSearchParams(window.location.search).get("decks");
-    if (dc && load) load.split("|").map(addDeck);
-  }, [addDeck, dc]);
+    if (dc && startingDecks) startingDecks.map(addDeck);
+  }, [addDeck, dc, startingDecks]);
 
-  console.log(data);
+  console.log(startingDecks, data);
 
   return (
     <div className="App">

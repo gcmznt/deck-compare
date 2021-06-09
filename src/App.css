@@ -13,8 +13,8 @@ a {
   height: 100vh;
   background: radial-gradient(
     circle,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.8) 100%
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 100%
   );
   display: flex;
   align-items: center;
@@ -60,6 +60,7 @@ a {
   background-color: #fff;
   padding: 20px;
   border-radius: 20px;
+  box-shadow: 0 5px 40px black;
 }
 
 .add-deck.closed form,
@@ -88,6 +89,7 @@ a {
 
 .headers {
   text-align: left;
+  vertical-align: top;
 }
 
 table {
@@ -96,7 +98,7 @@ table {
   table-layout: fixed;
   width: 100%;
   max-width: calc(var(--decks) * 400px);
-  margin: auto;
+  margin: 10px auto 80px;
 }
 
 td {
@@ -117,18 +119,31 @@ header {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-gap: 5px 10px;
+  align-items: end;
   text-align: right;
   margin: 0;
 }
 
 .card {
   padding: 10px;
-  background-color: aliceblue;
   margin: 2px 0;
-  border-left: 5px solid transparent;
   white-space: nowrap;
+  background-color: aliceblue;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+}
+
+.shared .card {
+  background-color: rgb(203, 231, 255);
+}
+
+.warning .card {
+  background-color: #fff5c4;
+}
+
+.danger .card {
+  background-color: #ffe3da;
 }
 
 .aspect,
@@ -137,30 +152,29 @@ header {
   line-height: 0;
 }
 
-.unique {
-  position: relative;
-}
-
-.unique::after {
-  content: "★ ";
-  /* color: #f2ca00; */
+.unique::before {
+  font-size: 4em;
+  content: "★";
+  position: absolute;
+  color: #f2ca00;
+  z-index: 0;
+  opacity: 0.3;
+  left: -5px;
+  top: 10px;
+  pointer-events: none;
 }
 
 .test button::before,
-.deck-name::before,
-.card .aspect::before {
+.deck-name::before {
   content: "● ";
   color: var(--color);
 }
 
-.warning {
-  background-color: #fff5c4;
-  border-left-color: #f2ca00;
-}
-
-.danger {
-  background-color: #ffe3da;
-  border-left-color: #ff5722;
+.card .aspect {
+  color: var(--color);
+  margin-right: 6px;
+  position: relative;
+  display: inline-block;
 }
 
 .chart {
@@ -268,6 +282,23 @@ header {
   color: var(--color);
 }
 
-.legend div + div {
-  margin-left: 5px;
+.legend div:not(:last-child) {
+  margin-right: 5px;
+}
+
+.card-resources {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  display: flex;
+  opacity: 0.5;
+}
+
+.card-resource {
+  width: 10px;
+  height: 12px;
+  margin: 0 2px;
+  display: block;
+  background-color: var(--color);
+  transform: skew(-15deg);
 }
