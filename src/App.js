@@ -374,7 +374,13 @@ function App({ startingDecks }) {
   const [data, setData] = useState({ cards: {}, decks: [] });
   const [showConflicts, setShowConflicts] = useState(false);
 
-  const addDeck = useCallback((deck) => dc.addDeck(deck).then(setData), [dc]);
+  const addDeck = useCallback(
+    (deck) => {
+      window.ga("send", "event", "Deck", "add", deck);
+      dc.addDeck(deck).then(setData);
+    },
+    [dc]
+  );
   const removeDeck = (index) => dc.removeDeck(index).then(setData);
   const toggleConflicts = (e) => setShowConflicts(e.target.checked);
 
