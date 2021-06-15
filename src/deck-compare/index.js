@@ -1,5 +1,6 @@
 function getInfo(id, type) {
   const local = localStorage.getItem(`${type}-${id}`);
+  if (!id) return Promise.resolve(false);
   if (local) return Promise.resolve(JSON.parse(local).data);
   return window
     .fetch(`https://marvelcdb.com/api/public/${type}/${id}`)
@@ -127,7 +128,7 @@ function getAspect(stats) {
 const regex = /marvelcdb\.com\/decklist\/view\/(?<id>[\d]+)/;
 
 function getIdFromUrl(url) {
-  return regex.exec(url).groups.id;
+  return regex.exec(url)?.groups.id;
 }
 
 export class DeckCompare {
@@ -153,7 +154,9 @@ export class DeckCompare {
 
   async addDeck(deck) {
     return getDeckInfo(isNaN(deck) ? getIdFromUrl(deck) : deck)
-      .then((info) => (this.decks = [...this.decks, { info }]))
+      .then(
+        (info) => (this.decks = info ? [...this.decks, { info }] : this.decks)
+      )
       .then(() => this.updateData());
   }
 
