@@ -45,7 +45,11 @@ function Card({ card, quantity }) {
   );
 }
 
-function byCardName(a, b) {
+function byAlpha(a, b) {
+  return a.info.name.localeCompare(b.info.name);
+}
+
+function byCardFaction(a, b) {
   if (a.info.faction_code === b.info.faction_code) {
     return a.info.name.localeCompare(b.info.name);
   }
@@ -53,6 +57,13 @@ function byCardName(a, b) {
   if (b.info.faction_code === "hero") return 1;
   if (a.info.faction_code === "basic") return -1;
   if (b.info.faction_code === "basic") return 1;
+}
+
+function byCardType(a, b) {
+  if (a.info.type_code === b.info.type_code) {
+    return a.info.name.localeCompare(b.info.name);
+  }
+  return a.info.type_code.localeCompare(b.info.type_code);
 }
 
 function Header({ deck, remove }) {
@@ -97,6 +108,8 @@ function Stats({ deck }) {
             2
           )}
         </dd>
+        <dt>Total resources:</dt>
+        <dd>{Object.values(deck.stats.resources).reduce((a, b) => a + b)}</dd>
         <dt>Resource/card:</dt>
         <dd>
           {(
@@ -373,6 +386,13 @@ function App({ startingDecks }) {
   const [dc, setDc] = useState(false);
   const [data, setData] = useState({ cards: {}, decks: [] });
   const [showConflicts, setShowConflicts] = useState(false);
+  const [sorter, setSorter] = useState("Alpha");
+
+  const sorters = {
+    Alpha: byAlpha,
+    CardFaction: byCardFaction,
+    CardType: byCardType,
+  };
 
   const addDeck = useCallback(
     (deck) => {
@@ -415,10 +435,20 @@ function App({ startingDecks }) {
   return (
     <div className="App">
       {new URLSearchParams(window.location.search).has("test") && (
-        <label>
-          <input type="checkbox" onChange={toggleConflicts} />
-          Show only shared cards
-        </label>
+        <div>
+          <label>
+            <input type="checkbox" onChange={toggleConflicts} />
+            Show only shared cards
+          </label>
+
+          <label>
+            <select onChange={(e) => setSorter(e.target.value)}>
+              <option value="Alpha">Alpha</option>
+              <option value="CardFaction">CardFaction</option>
+              <option value="CardType">CardType</option>
+            </select>
+          </label>
+        </div>
       )}
 
       <table style={{ "--decks": (data.decks || []).length }}>
@@ -445,12 +475,25 @@ function App({ startingDecks }) {
 
         <tbody className="decks">
           {Object.values(data.cards)
-            .sort(byCardName)
+            .sort(sorters[sorter])
             .filter((card) => !showConflicts || card.decks > 1)
-            .map((card, i) => (
-              <tr key={i}>
-                <Cards card={card} decks={data.decks} />
-              </tr>
+            .map((card, i, cards) => (
+              <React.Fragment key={i}>
+                {sorter === "CardType" &&
+                  card.info.type_code !== cards[i - 1]?.info.type_code && (
+                    <tr>
+                      <td
+                        colSpan={data.decks.length}
+                        className={`section-title ${card.info.type_code}`}
+                      >
+                        {card.info.type_name}
+                      </td>
+                    </tr>
+                  )}
+                <tr>
+                  <Cards card={card} decks={data.decks} />
+                </tr>
+              </React.Fragment>
             ))}
         </tbody>
       </table>

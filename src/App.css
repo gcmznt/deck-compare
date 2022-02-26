@@ -124,6 +124,7 @@ header {
   margin: 0;
 }
 
+.section-title,
 .card {
   padding: 10px;
   margin: 2px 0;
@@ -144,6 +145,11 @@ header {
 
 .danger .card {
   background-color: #ffe3da;
+}
+
+.section-title {
+  background-color: var(--color);
+  color: #fff;
 }
 
 .aspect,
